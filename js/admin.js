@@ -91,7 +91,7 @@ function renderProducts() {
     products
       .map(
         (p) =>
-          `<tr><td><div class="product-cell"><img class="table-image" src="${escapeHtml(p.image)}" alt=""><span>${escapeHtml(p.name)}</span></div></td><td>${escapeHtml(p.category)}</td><td><b>${Number(p.price).toFixed(2)} د.أ</b></td><td><span class="status ${p.status === "متوفر" ? "available" : "unavailable"}">${escapeHtml(p.status)}</span></td><td><button class="action-button" data-edit="${p.id}">تعديل</button><button class="action-button delete" data-delete="${p.id}">حذف</button></td></tr>`,
+          `<tr><td><div class="product-cell"><img class="table-image" src="${escapeHtml(p.image)}" alt=""><span>${escapeHtml(p.name)}</span></div></td><td>${escapeHtml(p.category)}</td><td><b>${Number(p.price).toFixed(2)} د.ع</b></td><td><span class="status ${p.status === "متوفر" ? "available" : "unavailable"}">${escapeHtml(p.status)}</span></td><td><button class="action-button" data-edit="${p.id}">تعديل</button><button class="action-button delete" data-delete="${p.id}">حذف</button></td></tr>`,
       )
       .join("") || '<tr><td colspan="5">لا توجد منتجات بعد.</td></tr>';
 }
@@ -102,7 +102,7 @@ function renderOrders() {
     orders
       .map(
         (order) =>
-          `<article class="order-card"><div class="order-card-header"><div><strong>${escapeHtml(order.customerName)}</strong><span class="order-time"> · ${formatDate(order.createdAt)}</span></div><select class="status-select" data-status="${order.id}"><option ${order.status === "جديد" ? "selected" : ""}>جديد</option><option ${order.status === "قيد التجهيز" ? "selected" : ""}>قيد التجهيز</option><option ${order.status === "تم التجهيز" ? "selected" : ""}>تم التجهيز</option><option ${order.status === "تم التوصيل" ? "selected" : ""}>تم التوصيل</option><option ${order.status === "ملغي" ? "selected" : ""}>ملغي</option></select></div><div class="order-products">${order.items.map((i) => `${escapeHtml(i.name)} × ${i.quantity}`).join("، ")}</div><div class="order-details"><span>الهاتف: <b>${escapeHtml(order.phone)}</b></span><span>العنوان: <b>${escapeHtml(order.address)}</b></span><span>المجموع: <b>${Number(order.total).toFixed(2)} د.أ</b></span>${order.notes ? `<span>ملاحظات: <b>${escapeHtml(order.notes)}</b></span>` : ""}</div></article>`,
+          `<article class="order-card"><div class="order-card-header"><div><strong>${escapeHtml(order.customerName)}</strong><span class="order-time"> · ${formatDate(order.createdAt)}</span></div><select class="status-select" data-status="${order.id}"><option ${order.status === "جديد" ? "selected" : ""}>جديد</option><option ${order.status === "قيد التجهيز" ? "selected" : ""}>قيد التجهيز</option><option ${order.status === "تم التجهيز" ? "selected" : ""}>تم التجهيز</option><option ${order.status === "تم التوصيل" ? "selected" : ""}>تم التوصيل</option><option ${order.status === "ملغي" ? "selected" : ""}>ملغي</option></select></div><div class="order-products">${order.items.map((i) => `${escapeHtml(i.name)} × ${i.quantity}`).join("، ")}</div><div class="order-details"><span>الهاتف: <b>${escapeHtml(order.phone)}</b></span><span>العنوان: <b>${escapeHtml(order.address)}</b></span><span>المجموع: <b>${Number(order.total).toFixed(2)} د.ع</b></span>${order.notes ? `<span>ملاحظات: <b>${escapeHtml(order.notes)}</b></span>` : ""}</div></article>`,
       )
       .join("") || '<div class="empty-state">لا توجد طلبات حتى الآن.</div>';
 }
@@ -125,7 +125,7 @@ function updateStats() {
       .slice(0, 4)
       .map(
         (o) =>
-          `<div class="order-details"><span><b>${escapeHtml(o.customerName)}</b><br>${escapeHtml(o.items[0]?.name || "")}</span><span>المجموع<br><b>${Number(o.total).toFixed(2)} د.أ</b></span><span class="status ${o.status === "جديد" ? "new" : o.status === "ملغي" ? "cancelled" : "done"}">${escapeHtml(o.status)}</span></div>`,
+          `<div class="order-details"><span><b>${escapeHtml(o.customerName)}</b><br>${escapeHtml(o.items[0]?.name || "")}</span><span>المجموع<br><b>${Number(o.total).toFixed(2)} د.ع</b></span><span class="status ${o.status === "جديد" ? "new" : o.status === "ملغي" ? "cancelled" : "done"}">${escapeHtml(o.status)}</span></div>`,
       )
       .join("") ||
     '<p style="color:#788783;font-size:12px">لا توجد طلبات حديثة.</p>';

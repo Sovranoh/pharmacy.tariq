@@ -80,7 +80,7 @@ function displayProducts() {
   grid.innerHTML = shown
     .map(
       (p, index) =>
-        `<article class="product-card" style="animation-delay:${index * 60}ms"><div class="product-image">${p.image ? `<img src="${escapeAttribute(p.image)}" alt="${escapeAttribute(p.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">` : ""}<span class="fallback" style="${p.image ? "display:none" : ""}">✚</span></div><div class="product-info"><span class="product-category">${escapeHtml(p.category)}</span><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.description)}</p><div class="product-bottom"><strong class="price">${Number(p.price).toFixed(2)} د.أ</strong><button class="add-button" data-add="${p.id}" ${p.status === "غير متوفر" ? "disabled" : ""}>${p.status === "غير متوفر" ? "غير متوفر" : "+ أضف للطلب"}</button></div></div></article>`,
+          `<article class="product-card" style="animation-delay:${index * 60}ms"><div class="product-image">${p.image ? `<img src="${escapeAttribute(p.image)}" alt="${escapeAttribute(p.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">` : ""}<span class="fallback" style="${p.image ? "display:none" : ""}">✚</span></div><div class="product-info"><span class="product-category">${escapeHtml(p.category)}</span><h3>${escapeHtml(p.name)}</h3><p>${escapeHtml(p.description)}</p><div class="product-bottom"><strong class="price">${Number(p.price).toFixed(2)} د.ع</strong><button class="add-button" data-add="${p.id}" ${p.status === "غير متوفر" ? "disabled" : ""}>${p.status === "غير متوفر" ? "غير متوفر" : "+ أضف للطلب"}</button></div></div></article>`,
     )
     .join("");
 }
@@ -118,7 +118,7 @@ function renderCart() {
     (sum, i) => sum + i.quantity,
     0,
   );
-  document.getElementById("cartTotal").textContent = `${total.toFixed(2)} د.أ`;
+  document.getElementById("cartTotal").textContent = `${total.toFixed(2)} د.ع`;
   document
     .getElementById("cartEmpty")
     .classList.toggle("hidden", cart.length > 0);
@@ -129,7 +129,7 @@ function renderCart() {
     .map((item) => {
       const p = products.find((product) => product.id === item.id);
       if (!p) return "";
-      return `<div class="cart-item"><img class="cart-thumb" src="${escapeAttribute(p.image)}" alt=""><div class="cart-item-main"><h3>${escapeHtml(p.name)}</h3><span class="price">${(p.price * item.quantity).toFixed(2)} د.أ</span><div class="quantity"><button data-minus="${p.id}">−</button><span>${item.quantity}</span><button data-plus="${p.id}">+</button><button class="remove" data-remove="${p.id}">حذف</button></div></div></div>`;
+      return `<div class="cart-item"><img class="cart-thumb" src="${escapeAttribute(p.image)}" alt=""><div class="cart-item-main"><h3>${escapeHtml(p.name)}</h3><span class="price">${(p.price * item.quantity).toFixed(2)} د.ع</span><div class="quantity"><button data-minus="${p.id}">−</button><span>${item.quantity}</span><button data-plus="${p.id}">+</button><button class="remove" data-remove="${p.id}">حذف</button></div></div></div>`;
     })
     .join("");
 }
