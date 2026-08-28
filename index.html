@@ -1,81 +1,214 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="صيدلية نبع الصحة - منتجات صحية موثوقة وتوصيل سريع">
-  <title>نبع الصحة | صيدليتك الرقمية</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=DM+Sans:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <div class="announcement">توصيل سريع وآمن إلى باب منزلك <span>•</span> اطلب الآن واستلم بسهولة</div>
-  <header class="site-header">
-    <nav class="nav container" aria-label="التنقل الرئيسي">
-      <a class="brand" href="#home" aria-label="نبع الصحة - الرئيسية">
-        <span class="brand-mark">+</span><span><strong>نبع</strong> الصحة</span>
-      </a>
-      <div class="nav-links">
-        <a class="active" href="#home">الرئيسية</a>
-        <a href="#products">المنتجات</a>
-        <a href="#about">لماذا نحن؟</a>
-      </div>
-      <button class="cart-button" id="cartButton" type="button" aria-label="فتح السلة">
-        <span class="cart-icon">🛒</span><span>السلة</span><b id="cartCount">0</b>
-      </button>
-    </nav>
-  </header>
-
-  <main>
-    <section class="hero" id="home">
-      <div class="hero-shape"></div>
-      <div class="container hero-content">
-        <div class="hero-copy reveal">
-          <p class="eyebrow">رعاية أقرب إليك</p>
-          <h1>صحتك تبدأ<br><em>من اهتمامك.</em></h1>
-          <p class="hero-text">كل ما تحتاجه لصحتك اليومية، مختار بعناية ويصل إليك بسرعة واهتمام.</p>
-          <a class="primary-button" href="#products">تصفح المنتجات <span>←</span></a>
-          <div class="trust-row"><span>✓ منتجات موثوقة</span><span>✓ توصيل آمن</span></div>
-        </div>
-        <div class="hero-art reveal" aria-label="منتجات عناية صحية">
-          <div class="sun-disc"></div><div class="art-label">عناية<br><strong>يومية</strong></div>
-          <div class="bottle bottle-one"><span>VITA</span><small>daily care</small></div>
-          <div class="bottle bottle-two"><span>PURE</span><small>wellness</small></div>
-          <div class="leaf leaf-one">✦</div><div class="leaf leaf-two">✦</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="benefits container" id="about">
-      <div><span class="benefit-icon">✚</span><div><strong>منتجات أصلية</strong><small>نختار الأفضل لك</small></div></div>
-      <div><span class="benefit-icon">◷</span><div><strong>توصيل سريع</strong><small>في نفس اليوم</small></div></div>
-      <div><span class="benefit-icon">♡</span><div><strong>رعاية باهتمام</strong><small>نحن بجانبك دائماً</small></div></div>
-    </section>
-
-    <section class="products-section container" id="products">
-      <div class="section-heading"><div><p class="eyebrow">اختياراتنا لك</p><h2>منتجات <span>مختارة</span></h2></div><p class="section-note">اكتشف مجموعة من المنتجات التي<br>تدعم صحتك كل يوم</p></div>
-      <div class="toolbar"><div class="filters" id="categoryFilters"><button class="filter active" data-category="الكل">الكل</button><button class="filter" data-category="فيتامينات">فيتامينات</button><button class="filter" data-category="عناية">عناية شخصية</button><button class="filter" data-category="أدوية">أدوية</button></div><label class="search-box"><span>⌕</span><input id="productSearch" type="search" placeholder="ابحث عن منتج..."></label></div>
-      <div class="products-grid" id="productsGrid"></div>
-      <div class="empty-state hidden" id="emptyProducts">لا توجد منتجات مطابقة لبحثك.</div>
-    </section>
-
-    <section class="order-callout container"><div><p class="eyebrow">نحن هنا لمساعدتك</p><h2>جاهز للاهتمام بصحتك؟</h2><p>أضف احتياجاتك إلى السلة وسنتولى الباقي.</p></div><a class="light-button" href="#products">ابدأ طلبك الآن <span>←</span></a></section>
-  </main>
-
-  <div class="drawer-backdrop" id="drawerBackdrop"></div>
-  <aside class="cart-drawer" id="cartDrawer" aria-label="سلة الطلب">
-    <div class="drawer-header"><div><p class="eyebrow">طلبك</p><h2>سلة المنتجات</h2></div><button class="icon-button" id="closeCart" type="button" aria-label="إغلاق السلة">×</button></div>
-    <div class="cart-items" id="cartItems"></div>
-    <div class="cart-empty" id="cartEmpty"><span>🛍</span><strong>السلة فارغة</strong><p>أضف بعض المنتجات لتبدأ طلبك.</p></div>
-    <div class="checkout" id="checkout">
-      <div class="total-row"><span>المجموع</span><strong id="cartTotal">0.00 د.ع</strong></div>
-      <form id="orderForm"><label>اسم الزبون<input name="customerName" required placeholder="اكتب اسمك الكامل"></label><label>رقم الهاتف<input name="phone" type="tel" required placeholder="07xxxxxxxx"></label><label>العنوان<textarea name="address" required rows="2" placeholder="عنوان التوصيل بالتفصيل"></textarea></label><label>ملاحظات إضافية<textarea name="notes" rows="2" placeholder="مثال: أريد توصيل الطلب بعد الساعة 6 مساءً"></textarea></label><button class="primary-button full" type="submit">إرسال الطلب <span>←</span></button></form>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="صيدلية نبع الصحة - منتجات صحية موثوقة وتوصيل سريع"
+    />
+    <title>نبع الصحة | صيدليتك الرقمية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=DM+Sans:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="announcement">
+      توصيل سريع وآمن إلى باب منزلك <span>•</span> اطلب الآن واستلم بسهولة
     </div>
-    <div class="order-success hidden" id="orderSuccess"><span>✓</span><h3>تم استلام طلبك</h3><p>شكراً لك. سنتواصل معك قريباً لتأكيد الطلب.</p><button class="secondary-button" id="continueShopping" type="button">متابعة التسوق</button></div>
-  </aside>
-  <footer><div class="container footer-content"><a class="brand" href="#home"><span class="brand-mark">+</span><span><strong>نبع</strong> الصحة</span></a><p>رعاية موثوقة، كل يوم.</p><small>© 2025 نبع الصحة</small></div></footer>
-  <script src="js/app.js"></script>
-</body>
+    <header class="site-header">
+      <nav class="nav container" aria-label="التنقل الرئيسي">
+        <a class="brand" href="#home" aria-label="نبع الصحة - الرئيسية">
+          <span class="brand-mark">+</span
+          ><span><strong>نبع</strong> الصحة</span>
+        </a>
+        <div class="nav-links">
+          <a class="active" href="#home">الرئيسية</a>
+          <a href="#products">المنتجات</a>
+          <a href="#about">لماذا نحن؟</a>
+        </div>
+        <button
+          class="cart-button"
+          id="cartButton"
+          type="button"
+          aria-label="فتح السلة"
+        >
+          <span class="cart-icon">🛒</span><span>السلة</span
+          ><b id="cartCount">0</b>
+        </button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="home">
+        <div class="hero-shape"></div>
+        <div class="container hero-content">
+          <div class="hero-copy reveal">
+            <p class="eyebrow">رعاية أقرب إليك</p>
+            <h1>صحتك تبدأ<br /><em>من اهتمامك.</em></h1>
+            <p class="hero-text">
+              كل ما تحتاجه لصحتك اليومية، مختار بعناية ويصل إليك بسرعة واهتمام.
+            </p>
+            <a class="primary-button" href="#products"
+              >تصفح المنتجات <span>←</span></a
+            >
+            <div class="trust-row">
+              <span>✓ منتجات موثوقة</span><span>✓ توصيل آمن</span>
+            </div>
+          </div>
+          <div class="hero-art reveal" aria-label="منتجات عناية صحية">
+            <div class="sun-disc"></div>
+            <div class="art-label">عناية<br /><strong>يومية</strong></div>
+            <div class="bottle bottle-one">
+              <span>VITA</span><small>daily care</small>
+            </div>
+            <div class="bottle bottle-two">
+              <span>PURE</span><small>wellness</small>
+            </div>
+            <div class="leaf leaf-one">✦</div>
+            <div class="leaf leaf-two">✦</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="benefits container" id="about">
+        <div>
+          <span class="benefit-icon">✚</span>
+          <div><strong>منتجات أصلية</strong><small>نختار الأفضل لك</small></div>
+        </div>
+        <div>
+          <span class="benefit-icon">◷</span>
+          <div><strong>توصيل سريع</strong><small>في نفس اليوم</small></div>
+        </div>
+        <div>
+          <span class="benefit-icon">♡</span>
+          <div>
+            <strong>رعاية باهتمام</strong><small>نحن بجانبك دائماً</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="products-section container" id="products">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">اختياراتنا لك</p>
+            <h2>منتجات <span>مختارة</span></h2>
+          </div>
+          <p class="section-note">
+            اكتشف مجموعة من المنتجات التي<br />تدعم صحتك كل يوم
+          </p>
+        </div>
+        <div class="toolbar">
+          <div class="filters" id="categoryFilters">
+            <button class="filter active" data-category="الكل">الكل</button
+            ><button class="filter" data-category="فيتامينات">فيتامينات</button
+            ><button class="filter" data-category="عناية">عناية شخصية</button
+            ><button class="filter" data-category="أدوية">أدوية</button>
+          </div>
+          <label class="search-box"
+            ><span>⌕</span
+            ><input
+              id="productSearch"
+              type="search"
+              placeholder="ابحث عن منتج..."
+          /></label>
+        </div>
+        <div class="products-grid" id="productsGrid"></div>
+        <div class="empty-state hidden" id="emptyProducts">
+          لا توجد منتجات مطابقة لبحثك.
+        </div>
+      </section>
+
+      <section class="order-callout container">
+        <div>
+          <p class="eyebrow">نحن هنا لمساعدتك</p>
+          <h2>جاهز للاهتمام بصحتك؟</h2>
+          <p>أضف احتياجاتك إلى السلة وسنتولى الباقي.</p>
+        </div>
+        <a class="light-button" href="#products"
+          >ابدأ طلبك الآن <span>←</span></a
+        >
+      </section>
+    </main>
+
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <aside class="cart-drawer" id="cartDrawer" aria-label="سلة الطلب">
+      <div class="drawer-header">
+        <div>
+          <p class="eyebrow">طلبك</p>
+          <h2>سلة المنتجات</h2>
+        </div>
+        <button
+          class="icon-button"
+          id="closeCart"
+          type="button"
+          aria-label="إغلاق السلة"
+        >
+          ×
+        </button>
+      </div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-empty" id="cartEmpty">
+        <span>🛍</span><strong>السلة فارغة</strong>
+        <p>أضف بعض المنتجات لتبدأ طلبك.</p>
+      </div>
+      <div class="checkout" id="checkout">
+        <div class="total-row">
+          <span>المجموع</span><strong id="cartTotal">0.00 د.أ</strong>
+        </div>
+        <form id="orderForm">
+          <label
+            >اسم الزبون<input
+              name="customerName"
+              required
+              placeholder="اكتب اسمك الكامل" /></label
+          ><label
+            >رقم الهاتف<input
+              name="phone"
+              type="tel"
+              required
+              placeholder="07xxxxxxxx" /></label
+          ><label
+            >العنوان<textarea
+              name="address"
+              required
+              rows="2"
+              placeholder="عنوان التوصيل بالتفصيل"
+            ></textarea></label
+          ><label
+            >ملاحظات إضافية<textarea
+              name="notes"
+              rows="2"
+              placeholder="مثال: أريد توصيل الطلب بعد الساعة 6 مساءً"
+            ></textarea></label
+          ><button class="primary-button full" type="submit">
+            إرسال الطلب <span>←</span>
+          </button>
+        </form>
+      </div>
+      <div class="order-success hidden" id="orderSuccess">
+        <span>✓</span>
+        <h3>تم استلام طلبك</h3>
+        <p>شكراً لك. سنتواصل معك قريباً لتأكيد الطلب.</p>
+        <button class="secondary-button" id="continueShopping" type="button">
+          متابعة التسوق
+        </button>
+      </div>
+    </aside>
+    <footer>
+      <div class="container footer-content">
+        <a class="brand" href="#home"
+          ><span class="brand-mark">+</span
+          ><span><strong>نبع</strong> الصحة</span></a
+        >
+        <p>رعاية موثوقة، كل يوم.</p>
+        <small>© 2025 نبع الصحة</small>
+      </div>
+    </footer>
+    <script src="js/app.js"></script>
+  </body>
 </html>
