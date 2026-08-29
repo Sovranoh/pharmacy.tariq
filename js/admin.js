@@ -46,9 +46,10 @@ const defaultProducts = [
   },
 ];
 let products = getData(STORAGE_KEYS.products, defaultProducts);
-let orders = getData(STORAGE_KEYS.orders, []);
+let orders = []; // تم تعديلها لتعتمد على جلب البيانات من الـ Firebase مباشرة وتتجنب التصفير
 let productsUnsubscribe;
 let ordersUnsubscribe;
+
 function getData(key, fallback) {
   try {
     return JSON.parse(localStorage.getItem(key)) || fallback;
@@ -98,6 +99,7 @@ function loadProducts() {
       updateStats();
     }, (error) => console.error("تعذر تحميل المنتجات من Firebase:", error));
 }
+
 function loadOrders() {
   if (ordersUnsubscribe) ordersUnsubscribe();
   ordersUnsubscribe = pharmacyDb
@@ -109,6 +111,7 @@ function loadOrders() {
       updateStats();
     }, (error) => console.error("تعذر تحميل الطلبات من Firebase:", error));
 }
+
 function renderProducts() {
   document.getElementById("productsTable").innerHTML =
     products
@@ -118,44 +121,59 @@ function renderProducts() {
       )
       .join("") || '<tr><td colspan="5">لا توجد منتجات بعد.</td></tr>';
 }
+
 function renderOrders() {
   const list = document.getElementById("ordersList");
-  document.getElementById("ordersSummary").textContent = `${orders.length} طلب`;
+  const summaryEl = document.getElementById("ordersSummary");
+  if (summaryEl) summaryEl.textContent = `${orders.length} طلب`;
+  
+  if (!list) return;
   list.innerHTML =
     orders
       .map(
         (order) =>
-          `<article class="order-card"><div class="order-card-header"><div><strong>${escapeHtml(order.customerName)}</strong><span class="order-time"> · ${formatDate(order.createdAt)}</span></div><select class="status-select" data-status="${order.id}"><option ${order.status === "جديد" ? "selected" : ""}>جديد</option><option ${order.status === "قيد التجهيز" ? "selected" : ""}>قيد التجهيز</option><option ${order.status === "تم التجهيز" ? "selected" : ""}>تم التجهيز</option><option ${order.status === "تم التوصيل" ? "selected" : ""}>تم التوصيل</option><option ${order.status === "ملغي" ? "selected" : ""}>ملغي</option></select></div><div class="order-products">${order.items.map((i) => `${escapeHtml(i.name)} × ${i.quantity}`).join("، ")}</div><div class="order-details"><span>الهاتف: <b>${escapeHtml(order.phone)}</b></span><span>العنوان: <b>${escapeHtml(order.address)}</b></span><span>المجموع: <b>${Number(order.total).toFixed(2)} د.ع</b></span>${order.notes ? `<span>ملاحظات: <b>${escapeHtml(order.notes)}</b></span>` : ""}</div></article>`,
+          `<article class="order-card"><div class="order-card-header"><div><strong>${escapeHtml(order.customerName)}</strong><span class="order-time"> · ${formatDate(order.createdAt)}</span></div><select class="status-select" data-status="${order.id}"><option ${order.status === "جديد" ? "selected" : ""}>جديد</option><option ${order.status === "قيد التجهيز" ? "selected" : ""}>قيد التجهيز</option><option ${order.status === "تم التجهيز" ? "selected" : ""}>تم التجهيز</option><option ${order.status === "تم التوصيل" ? "selected" : ""}>تم التوصيل</option><option ${order.status === "ملغي" ? "selected" : ""}>ملغي</option></select></div><div class="order-products">${(order.items || []).map((i) => `${escapeHtml(i.name)} × ${i.quantity}`).join("، ")}</div><div class="order-details"><span>الهاتف: <b>${escapeHtml(order.phone)}</b></span><span>العنوان: <b>${escapeHtml(order.address)}</b></span><span>المجموع: <b>${Number(order.total).toFixed(2)} د.ع</b></span>${order.notes ? `<span>ملاحظات: <b>${escapeHtml(order.notes)}</b></span>` : ""}</div></article>`,
       )
       .join("") || '<div class="empty-state">لا توجد طلبات حتى الآن.</div>';
 }
+
 function updateStats() {
-  products = getData(STORAGE_KEYS.products, defaultProducts);
-  orders = getData(STORAGE_KEYS.orders, []);
-  document.getElementById("statProducts").textContent = products.length;
-  document.getElementById("statOrders").textContent = orders.length;
-  document.getElementById("statNewOrders").textContent = orders.filter(
-    (o) => o.status === "جديد",
-  ).length;
-  document.getElementById("sideOrderCount").textContent = orders.filter(
-    (o) => o.status === "جديد",
-  ).length;
-  document.getElementById("statSales").textContent = orders
-    .reduce((sum, o) => sum + Number(o.total), 0)
-    .toFixed(2);
-  document.getElementById("recentOrders").innerHTML =
-    orders
-      .slice(0, 4)
-      .map(
-        (o) =>
-          `<div class="order-details"><span><b>${escapeHtml(o.customerName)}</b><br>${escapeHtml(o.items[0]?.name || "")}</span><span>المجموع<br><b>${Number(o.total).toFixed(2)} د.ع</b></span><span class="status ${o.status === "جديد" ? "new" : o.status === "ملغي" ? "cancelled" : "done"}">${escapeHtml(o.status)}</span></div>`,
-      )
-      .join("") ||
-    '<p style="color:#788783;font-size:12px">لا توجد طلبات حديثة.</p>';
-    document.getElementById("statCompletedOrders").textContent = orders.filter(
-      (o) => o.status === "تم التوصيل",
-    ).length;
+  const statProducts = document.getElementById("statProducts");
+  const statOrders = document.getElementById("statOrders");
+  const statNewOrders = document.getElementById("statNewOrders");
+  const sideOrderCount = document.getElementById("sideOrderCount");
+  const statSales = document.getElementById("statSales");
+  const recentOrders = document.getElementById("recentOrders");
+  const statCompletedOrders = document.getElementById("statCompletedOrders");
+
+  if (statProducts) statProducts.textContent = products.length;
+  if (statOrders) statOrders.textContent = orders.length;
+  if (statNewOrders) statNewOrders.textContent = orders.filter((o) => o.status === "جديد").length;
+  if (sideOrderCount) sideOrderCount.textContent = orders.filter((o) => o.status === "جديد").length;
+  
+  if (statSales) {
+    statSales.textContent = orders
+      .reduce((sum, o) => sum + Number(o.total || 0), 0)
+      .toFixed(2);
+  }
+
+  if (recentOrders) {
+    recentOrders.innerHTML =
+      orders
+        .slice(0, 4)
+        .map(
+          (o) =>
+            `<div class="order-details"><span><b>${escapeHtml(o.customerName)}</b><br>${escapeHtml(o.items?.[0]?.name || "")}</span><span>المجموع<br><b>${Number(o.total).toFixed(2)} د.ع</b></span><span class="status ${o.status === "جديد" ? "new" : o.status === "ملغي" ? "cancelled" : "done"}">${escapeHtml(o.status)}</span></div>`,
+        )
+        .join("") ||
+      '<p style="color:#788783;font-size:12px">لا توجد طلبات حديثة.</p>';
+  }
+
+  if (statCompletedOrders) {
+    statCompletedOrders.textContent = orders.filter((o) => o.status === "تم التوصيل").length;
+  }
 }
+
 async function addProduct(event) {
   event.preventDefault();
   const form = new FormData(event.target);
@@ -181,6 +199,7 @@ async function addProduct(event) {
   }
   closeModal();
 }
+
 function editProduct(id) {
   const product = products.find((p) => p.id === id);
   if (!product) return;
@@ -191,6 +210,7 @@ function editProduct(id) {
   document.getElementById("modalTitle").textContent = "تعديل المنتج";
   openModal();
 }
+
 async function deleteProduct(id) {
   const product = products.find((p) => p.id === id);
   if (!product || !confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
@@ -201,22 +221,36 @@ async function deleteProduct(id) {
     alert("تعذر حذف المنتج حالياً. حاول مرة أخرى.");
   }
 }
+
 async function updateOrderStatus(id, status) {
   try {
     const orderReference = pharmacyDb.collection("orders").doc(id);
+    
     await pharmacyDb.runTransaction(async (transaction) => {
+      // 1. مرحلة القراءة (Reads) أولاً بالكامل
       const orderSnapshot = await transaction.get(orderReference);
+      if (!orderSnapshot.exists) return;
       const order = orderSnapshot.data();
-      if (!order) return;
 
+      const productReads = [];
       if (status === "تم التوصيل" && order.status !== "تم التوصيل" && !order.inventoryApplied) {
         for (const item of order.items || []) {
           const productReference = pharmacyDb.collection("products").doc(item.id);
-          const productSnapshot = await transaction.get(productReference);
-          if (productSnapshot.exists) {
-            const soldCount = Number(productSnapshot.data().soldCount || 0);
-            transaction.update(productReference, {
-              soldCount: soldCount + Number(item.quantity || 0),
+          productReads.push({
+            ref: productReference,
+            quantity: Number(item.quantity || 0),
+            snap: await transaction.get(productReference)
+          });
+        }
+      }
+
+      // 2. مرحلة الكتابة (Writes) بعد اكتمال كل القراءات
+      if (status === "تم التوصيل" && order.status !== "تم التوصيل" && !order.inventoryApplied) {
+        for (const prod of productReads) {
+          if (prod.snap.exists) {
+            const soldCount = Number(prod.snap.data().soldCount || 0);
+            transaction.update(prod.ref, {
+              soldCount: soldCount + prod.quantity,
             });
           }
         }
@@ -228,11 +262,13 @@ async function updateOrderStatus(id, status) {
         transaction.update(orderReference, { status });
       }
     });
+    console.log("تم تحديث حالة الطلب بنجاح");
   } catch (error) {
     console.error("تعذر تحديث حالة الطلب في Firebase:", error);
     alert("تعذر تحديث حالة الطلب حالياً. حاول مرة أخرى.");
   }
 }
+
 function openModal() {
   const modal = document.getElementById("modalBackdrop");
   modal.classList.remove("hidden");
@@ -269,6 +305,7 @@ function startDashboard() {
   loadProducts();
   loadOrders();
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   if (sessionStorage.getItem("admin_logged_in") === "true") {
     startDashboard();
