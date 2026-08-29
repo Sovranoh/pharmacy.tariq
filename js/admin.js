@@ -239,13 +239,18 @@ function startDashboard() {
   loadOrders();
 }
 document.addEventListener("DOMContentLoaded", () => {
+  if (sessionStorage.getItem("admin_logged_in") === "true") {
+    startDashboard();
+  }
   document.getElementById("loginForm").addEventListener("submit", (e) => {
     e.preventDefault();
     if (document.getElementById("adminCode").value === ADMIN_CODE) {
+      sessionStorage.setItem("admin_logged_in", "true");
       startDashboard();
     } else document.getElementById("loginError").classList.add("show");
   });
   document.getElementById("logoutButton").addEventListener("click", () => {
+    sessionStorage.removeItem("admin_logged_in");
     location.reload();
   });
   document
