@@ -152,10 +152,16 @@ function updateStats() {
       )
       .join("") ||
     '<p style="color:#788783;font-size:12px">لا توجد طلبات حديثة.</p>';
+    document.getElementById("statCompletedOrders").textContent = orders.filter(
+      (o) => o.status === "تم التوصيل",
+    ).length;
 }
 async function addProduct(event) {
   event.preventDefault();
   const form = new FormData(event.target);
+  const existingProduct = products.find(
+    (product) => product.id === form.get("productId"),
+  );
   const data = {
     id: form.get("productId") || `p${Date.now()}`,
     name: form.get("name"),
@@ -164,6 +170,7 @@ async function addProduct(event) {
     image: form.get("image") || "",
     category: form.get("category"),
     status: form.get("status"),
+    soldCount: Number(existingProduct?.soldCount || 0),
   };
   try {
     await pharmacyDb.collection("products").doc(data.id).set(data);
@@ -196,7 +203,31 @@ async function deleteProduct(id) {
 }
 async function updateOrderStatus(id, status) {
   try {
-    await pharmacyDb.collection("orders").doc(id).update({ status });
+    const orderReference = pharmacyDb.collection("orders").doc(id);
+    await pharmacyDb.runTransaction(async (transaction) => {
+      const orderSnapshot = await transaction.get(orderReference);
+      const order = orderSnapshot.data();
+      if (!order) return;
+
+      if (status === "تم التوصيل" && order.status !== "تم التوصيل" && !order.inventoryApplied) {
+        for (const item of order.items || []) {
+          const productReference = pharmacyDb.collection("products").doc(item.id);
+          const productSnapshot = await transaction.get(productReference);
+          if (productSnapshot.exists) {
+            const soldCount = Number(productSnapshot.data().soldCount || 0);
+            transaction.update(productReference, {
+              soldCount: soldCount + Number(item.quantity || 0),
+            });
+          }
+        }
+        transaction.update(orderReference, {
+          status,
+          inventoryApplied: true,
+        });
+      } else {
+        transaction.update(orderReference, { status });
+      }
+    });
   } catch (error) {
     console.error("تعذر تحديث حالة الطلب في Firebase:", error);
     alert("تعذر تحديث حالة الطلب حالياً. حاول مرة أخرى.");

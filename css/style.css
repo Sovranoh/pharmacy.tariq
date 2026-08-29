@@ -433,6 +433,12 @@ a {
   height: 39px;
   margin: 0 0 12px;
 }
+.sold-count {
+  display: block;
+  color: var(--green);
+  font-size: 10px;
+  margin: -5px 0 9px;
+}
 .product-bottom {
   display: flex;
   align-items: center;
