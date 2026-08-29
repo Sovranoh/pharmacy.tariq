@@ -47,6 +47,8 @@ const defaultProducts = [
 ];
 let products = getData(STORAGE_KEYS.products, defaultProducts);
 let orders = getData(STORAGE_KEYS.orders, []);
+let productsUnsubscribe;
+let ordersUnsubscribe;
 function getData(key, fallback) {
   try {
     return JSON.parse(localStorage.getItem(key)) || fallback;
@@ -77,14 +79,35 @@ function escapeHtml(value) {
   );
 }
 function loadProducts() {
-  products = getData(STORAGE_KEYS.products, defaultProducts);
-  renderProducts();
-  updateStats();
+  if (productsUnsubscribe) productsUnsubscribe();
+  productsUnsubscribe = pharmacyDb
+    .collection("products")
+    .orderBy("name")
+    .onSnapshot(async (snapshot) => {
+      if (snapshot.empty) {
+        const batch = pharmacyDb.batch();
+        defaultProducts.forEach((product) => {
+          const reference = pharmacyDb.collection("products").doc(product.id);
+          batch.set(reference, product);
+        });
+        await batch.commit();
+        return;
+      }
+      products = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      renderProducts();
+      updateStats();
+    }, (error) => console.error("تعذر تحميل المنتجات من Firebase:", error));
 }
 function loadOrders() {
-  orders = getData(STORAGE_KEYS.orders, []);
-  renderOrders();
-  updateStats();
+  if (ordersUnsubscribe) ordersUnsubscribe();
+  ordersUnsubscribe = pharmacyDb
+    .collection("orders")
+    .orderBy("createdAt", "desc")
+    .onSnapshot((snapshot) => {
+      orders = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      renderOrders();
+      updateStats();
+    }, (error) => console.error("تعذر تحميل الطلبات من Firebase:", error));
 }
 function renderProducts() {
   document.getElementById("productsTable").innerHTML =
@@ -130,7 +153,7 @@ function updateStats() {
       .join("") ||
     '<p style="color:#788783;font-size:12px">لا توجد طلبات حديثة.</p>';
 }
-function addProduct(event) {
+async function addProduct(event) {
   event.preventDefault();
   const form = new FormData(event.target);
   const data = {
@@ -142,11 +165,14 @@ function addProduct(event) {
     category: form.get("category"),
     status: form.get("status"),
   };
-  const existing = products.findIndex((p) => p.id === data.id);
-  existing > -1 ? (products[existing] = data) : products.unshift(data);
-  save(STORAGE_KEYS.products, products);
+  try {
+    await pharmacyDb.collection("products").doc(data.id).set(data);
+  } catch (error) {
+    console.error("تعذر حفظ المنتج في Firebase:", error);
+    alert("تعذر حفظ المنتج حالياً. حاول مرة أخرى.");
+    return;
+  }
   closeModal();
-  loadProducts();
 }
 function editProduct(id) {
   const product = products.find((p) => p.id === id);
@@ -158,19 +184,22 @@ function editProduct(id) {
   document.getElementById("modalTitle").textContent = "تعديل المنتج";
   openModal();
 }
-function deleteProduct(id) {
+async function deleteProduct(id) {
   const product = products.find((p) => p.id === id);
   if (!product || !confirm("هل أنت متأكد من حذف هذا المنتج؟")) return;
-  products = products.filter((p) => p.id !== id);
-  save(STORAGE_KEYS.products, products);
-  loadProducts();
+  try {
+    await pharmacyDb.collection("products").doc(id).delete();
+  } catch (error) {
+    console.error("تعذر حذف المنتج من Firebase:", error);
+    alert("تعذر حذف المنتج حالياً. حاول مرة أخرى.");
+  }
 }
-function updateOrderStatus(id, status) {
-  const order = orders.find((o) => o.id === id);
-  if (order) {
-    order.status = status;
-    save(STORAGE_KEYS.orders, orders);
-    loadOrders();
+async function updateOrderStatus(id, status) {
+  try {
+    await pharmacyDb.collection("orders").doc(id).update({ status });
+  } catch (error) {
+    console.error("تعذر تحديث حالة الطلب في Firebase:", error);
+    alert("تعذر تحديث حالة الطلب حالياً. حاول مرة أخرى.");
   }
 }
 function openModal() {

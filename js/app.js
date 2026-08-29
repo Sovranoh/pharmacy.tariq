@@ -48,6 +48,7 @@ const defaultProducts = [
 let products = getData(STORAGE_KEYS.products, defaultProducts);
 let cart = getData(STORAGE_KEYS.cart, []);
 let selectedCategory = "الكل";
+let productsUnsubscribe;
 function getData(key, fallback) {
   try {
     const data = JSON.parse(localStorage.getItem(key));
@@ -60,8 +61,20 @@ function save(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 function loadProducts() {
-  products = getData(STORAGE_KEYS.products, defaultProducts);
-  displayProducts();
+  productsUnsubscribe = pharmacyDb
+    .collection("products")
+    .orderBy("name")
+    .onSnapshot(
+      (snapshot) => {
+        products = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        displayProducts();
+      },
+      (error) => {
+        console.error("تعذر تحميل المنتجات من Firebase:", error);
+        products = getData(STORAGE_KEYS.products, defaultProducts);
+        displayProducts();
+      },
+    );
 }
 function displayProducts() {
   const grid = document.getElementById("productsGrid");
@@ -133,7 +146,7 @@ function renderCart() {
     })
     .join("");
 }
-function submitOrder(event) {
+async function submitOrder(event) {
   event.preventDefault();
   if (!cart.length) return;
   const form = new FormData(event.target);
@@ -159,9 +172,13 @@ function submitOrder(event) {
     status: "جديد",
     createdAt: new Date().toISOString(),
   };
-  const orders = getData(STORAGE_KEYS.orders, []);
-  orders.unshift(order);
-  save(STORAGE_KEYS.orders, orders);
+  try {
+    await pharmacyDb.collection("orders").doc(order.id).set(order);
+  } catch (error) {
+    console.error("تعذر إرسال الطلب إلى Firebase:", error);
+    alert("تعذر إرسال الطلب حالياً. حاول مرة أخرى.");
+    return;
+  }
   cart = [];
   save(STORAGE_KEYS.cart, cart);
   document.getElementById("orderForm").reset();
